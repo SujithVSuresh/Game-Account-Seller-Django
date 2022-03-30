@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+<style>
+.m_card{
+  margin-top: 80px;
+}
+
+</style>
+{% endblock %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-4 col-12 m_card">
+            <div class="card p-4">
+                <h2><b>Signup</b></h2>
+                <form method="POST" action="" autocomplete="off" class="mt-3">
+                    {% csrf_token %}
+                    {{form|crispy}}
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-block">Signup</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block extra_head %}
+<style>
+.my_card{
+  margin-top: 50px;
+}
+
+/* Style the buttons that are used to open and close the accordion panel */
+.accordion {
+  background-color: lightblue;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  outline: none;
+  transition: 0.4s;
+}
+
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+
+/* Style the accordion panel. Note: hidden by default */
+.panel {
+  padding: 0 18px;
+  display: none;
+  overflow: hidden;
+}
+
+.sorry{
+ margin-top: 125px;
+}
+
+.acc-img {  
+  display: block; 
+  margin-left: auto; 
+  margin-right: auto; 
+  height: 20rem; 
+  object-fit: contain;
+  background-color: black;
+}  
+
+
+</style>
+
+{% endblock extra_head %}
+{% block content %}
+<div class="container">
+    <div id="carouselExampleSlidesOnly" class="carousel slide mt-3" data-ride="carousel">
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img class="d-block w-100 acc-img" src="{{game.theme_image.url}}" alt="First slide">
+          </div>
+        </div>
+      </div>
+
+    <div class="row"> 
+      <div class="col-md-4 col-12">
+      <button class="accordion mt-3">Filter</button>
+      <div class="panel mt-3">
+          <div class="col">
+            <div class="card card-body">
+              <form method="get">
+        
+                {{ my_filter.form|crispy }}
+        
+                <button type="submit" class="btn btn-primary btn-block ">Filter</button>   
+              </form>
+            </div>
+          </div>
+      </div>
+      </div>
+      </div>
+
+    <div class="row"> 
+       {% for account in game_account %}
+        <div class="col-md-4 col-12 my_card">
+            <div class="card">                
+
+                  {% if account.payment_done == True %}
+                  <p>Someone payed</p>
+                  {% endif %}
+
+                  <div id="carousel-example-{{account.pk}}" class="carousel slide carousel-fade img-div" data-ride="carousel">
+                    <!--Indicators-->
+                    <ol class="carousel-indicators">
+                      {% for photos in account.account_images %}
+                      <li data-target="#carousel-example-1z" data-slide-to="{{ forloop.counter0 }}" class="{% if forloop.counter0 == 0 %} active {% endif %}"></li>
+                    {% endfor %}
+                    </ol>
+                    <!--/.Indicators-->
+                    <!--Slides-->
+                    <div class="carousel-inner" role="listbox">
+                    {% for photos in account.account_images %}
+                      <div class="carousel-item {% if forloop.counter0 == 0 %} active {% endif %}">
+                        <img class="d-block w-100 acc-img" src="{{photos.images.url}}">
+                         
+                      </div>
+                    {% endfor %}
+                      <!--/First slide-->
+                    <!--/.Slides-->
+                    <!--Controls-->
+                    <a class="carousel-control-prev" href="#carousel-example-{{account.pk}}" role="button" data-slide="prev">
+                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                      <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#carousel-example-{{account.pk}}" role="button" data-slide="next">
+                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                      <span class="sr-only">Next</span>
+                    </a>
+                    <!--/.Controls-->
+                  </div>
+                  </div>
+
+                <div class="card-body">
+                  <h4><b>Rs {{account.rate}}</b></h4>
+                  <p class="card-text">{{account.description}}</p>
+                </div>
+                <div class="d-grid gap-2 m-2">
+
+                 <!-- <form method="POST" action="{% url 'core:remove-from-cart' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="acc_id" value="{{account.pk}}">
+                    <button href="" type="submit" class="btn btn-primary btn-block ">Remove from Pocket</button>
+                  </form> -->
+             
+                  <form method="POST" action="" class="cart-form" id="{{account.pk}}">
+                    {% csrf_token %}
+                    <input type="hidden" name="acc_id" value="{{account.pk}}">
+                    
+                    <button href="" type="submit" class="btn btn-block btn-warning cart-btn{{account.pk}}">
+                      {% if account.pk not in cart_accounts.is_added %}
+                      Add to Pocket
+                      {% else %} 
+                      Remove from Pocket
+                      {% endif %}
+                    </button>         
+                  </form> 
+                        
+                </div>
+              </div>
+         </div>
+         {% empty %}
+         <div class="sorry p-3">
+          <h2><b>Sorry, No game accounts available.</b></h2>
+         </div>
+      {% endfor %}
+    </div>   
+</div>
+{% endblock content %}
+{% block js %}
+
+<script>
+  $( document ).ready(function() {
+    $('.cart-form').submit(function(e){
+      e.preventDefault()
+
+      const acc_id = $(this).attr('id')
+      console.log(acc_id)
+      
+      const btnText = $(`.cart-btn${acc_id}`).text()
+      const trim = $.trim(btnText)
+      console.log(btnText)
+
+      const cart_count = $('#cart1').text()
+      const trimCount = parseInt(cart_count)
+      console.log(trimCount + 1)
+
+      //const url = $(this).attr('action')
+
+      $.ajax({
+        type: 'POST',
+        url: '{% url "core:add-to-cart" %}',
+        data: {
+          'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val(),
+          'acc_id':acc_id
+        },
+
+        success: function(response) {
+          if(trim === 'Remove from Pocket'){
+            $(`.cart-btn${acc_id}`).text('Add to Pocket')
+            //res = trimCount - 1
+          } else {
+            $(`.cart-btn${acc_id}`).text('Remove from Pocket')
+            //res = trimCount + 1
+            
+          }
+          const cart_count = $('#cart1').text(response['resp'])
+        },
+        error: function(response){
+          console.log("error", response)
+        }
+
+      })
+
+   
+    })
+  })
+  
+var acc = document.getElementsByClassName("accordion");
+var i;
+for (i = 0; i < acc.length; i++) {
+  acc[i].addEventListener("click", function() {
+    /* Toggle between adding and removing the "active" class,
+    to highlight the button that controls the panel */
+    this.classList.toggle("active");
+
+    /* Toggle between hiding and showing the active panel */
+    var panel = this.nextElementSibling;
+    if (panel.style.display === "block") {
+      panel.style.display = "none";
+    } else {
+      panel.style.display = "block";
+    }
+  });
+}
+</script>
+
+{% endblock js %}
+

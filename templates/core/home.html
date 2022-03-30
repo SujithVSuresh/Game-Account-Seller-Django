@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+<style>
+.my_card{
+  margin-top: 100px;
+}
+
+.accordion {
+  background-color: lightblue;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  outline: none;
+  transition: 0.4s;
+}
+
+
+.sorry{
+ margin-top: 125px;
+}
+
+
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center"> 
+      <div class="col-md-4 my_card">
+        {% for game in games %}
+       <div class="card mt-3">
+       
+         <div class="card-body d-flex">
+           <h4 class="p-2 flex-grow-1">{{game.name}}</h4>
+         
+         <span class="p-2 material-icons-outlined">
+          arrow_forward
+          </span>
+         </div>
+     
+         <a href="{{game.get_absolute_url}}" class="stretched-link"></a>
+        </div>
+        {% endfor %}
+
+        <div class="row"> 
+          <div class="col-md-12 col-12">
+          <button class="accordion mt-3">Filter
+          </button>
+          <div class="panel mt-3">
+              <div class="col">
+                <div class="card card-body">
+                  {% for cart_item in order_confirm %}
+                  {% if cart_item.ordered == False %}
+                  <div class="card mt-4">
+                    <div class="card-body">
+                      <p>{{ cart_item.game_account.acc_owner }}</p>
+                      Did you get the account credantials?
+                      <a href="{% url 'core:order_confirm' cart_item.pk %}" type="button" class="btn btn-success">Yes</a>
+                     <span class="material-icons-outlined">
+                        whatsapp
+                        </span>
+                    </div>
+                  </div>
+                  {% endif %}
+                  {% endfor %}
+                 
+                </div>
+              </div>
+          </div>
+          </div>
+          </div>
+       
+       </div>
+    </div>   
+</div>
+{% endblock content %}
+{% block js %}
+<script>
+var acc = document.getElementsByClassName("accordion");
+var i;
+for (i = 0; i < acc.length; i++) {
+  acc[i].addEventListener("click", function() {
+    /* Toggle between adding and removing the "active" class,
+    to highlight the button that controls the panel */
+    this.classList.toggle("active");
+
+    /* Toggle between hiding and showing the active panel */
+    var panel = this.nextElementSibling;
+    if (panel.style.display === "block") {
+      panel.style.display = "none";
+    } else {
+      panel.style.display = "block";
+    }
+  });
+}
+</script>
+{% endblock js %}

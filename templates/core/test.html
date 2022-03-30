@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+<script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script> 
+{% endblock %}
+{% block content %}
+<form method="post" id="task-form">
+    {% csrf_token %}
+    <input type="text" placeholder="Enter Task" name="task" id="task" required>
+    <button type="submit">Save</button>
+</form>
+
+      
+
+<script type="text/javascript">
+$(document).on('submit','#task-form',function(e){
+    e.preventDefault();
+    $.ajax({
+        type:'POST',
+        url:'{% url "core:test" %}',
+        data:
+        {
+            task:$("#task").val(),
+            csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+        },
+        success:function(){
+              alert('Saved');
+                }
+        })
+    });
+</script>
+
+{% endblock content %}

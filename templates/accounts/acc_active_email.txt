@@ -1,0 +1,11 @@
+{% autoescape off %}
+Hello,
+
+Please click the below link to activate your account.
+
+{{ protocol }}://{{ domain }}{% url 'accounts:activate' uidb64=uid token=token %}
+
+Sincerely,
+The Website Team
+
+{% endautoescape %}

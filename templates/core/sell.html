@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block extra_head %}
+<style>
+.my_card{
+  margin-top: 150px;
+}
+.not-visible{
+    display: none;
+}
+
+</style>
+{% endblock %}
+{% block content %}
+  <main>
+    <div class="container">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+              <h5 class="card-title">Card title</h5>
+            <form method="post" action="" enctype="multipart/form-data" id="upload-form">
+                {% csrf_token %}
+                {{game_acc_form}}
+                <div class="form-group m-3">
+                    <label>Upload Image</label>
+                    <input required name="image" type="file" multiple class="form-control-file">
+                  </div> 
+      
+
+             <div>
+              <input type="submit" class="btn-primary">
+             </div>
+        
+            
+            </form>
+            <div id="progress-box" class="not-visible"></div>
+            <div id="cancel-box" class="not-visible">
+              <button id="cancel-btn" class="btn btn-danger">Cancel</button>
+            </div>
+          </div>
+
+    </div>
+  </main>
+
+{% endblock content %}
+{% block js %}
+<script>
+  const uploadForm = document.getElementById('')
+  
+</script>
+{% endblock js %}

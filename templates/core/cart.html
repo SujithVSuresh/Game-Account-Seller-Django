@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block extra_head %}
+<style>
+.my_card{
+  margin-top: 150px;
+}
+
+</style>
+{% endblock %}
+{% block content %}
+  <main class="tbl">
+    <div class="container">
+    <div class="table-responsive text-nowrap my_card">
+    <h2>Cart</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Game</th>
+            <th scope="col">Account Owner</th>
+            <th scope="col">Account Price</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody class="tbl-bdy">
+        {% for order_item in object.game_accounts.all %}
+        
+        <tr class="tbl-rw">
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ order_item.game_account.game }}</td>
+            <td>{{ order_item.game_account.acc_owner }}</td>
+            <td>Rs {{ order_item.game_account.rate }}</td>
+            {% if order_item.payment_done == False and order_item.ordered == False %}
+            <td><a class='btn btn-warning' href='{% url "core:checkout" order_item.game_account.pk %}'>Buy Now</a></td>
+
+            {% elif order_item.ordered == True %}
+            <td><a class='btn btn-success' href=''>Sold</a></td>  
+            {% elif order_item.payment_done == True %}
+            <td><a class='btn btn-success' href=''>Payed</a></td>
+            {% endif %}
+            <td>
+                <form method="GET" action="" class="cart-form2" id="{{order_item.game_account.pk}}">
+                   
+                    <input type="hidden" name="acc_id" value="{{order_item.game_account.id}}">
+                    <button class="btn btn-danger" id="dlt" type="submit">Delete</button>      
+                </form> 
+            </td>
+        </tr>
+      
+        {% empty %}
+        <tr>
+            <td colspan='5'>Your cart is empty</td>
+        </tr>
+        <tr>
+            <td colspan="5">
+            <a class='btn btn-warning float-right' href='/'>Continue shopping</a>
+            </td>
+        </tr>
+        {% endfor %}
+        {% if object.get_total %}
+        <tr>
+            <td colspan="3"><b>Order Total</b></td>
+            <td><b>Rs {{ object.get_total }}</b></td>
+        </tr>
+        <tr>
+            <td colspan="5">
+            <a class='btn btn-warning float-right' href='/'>Continue shopping</a>
+            </td>
+        </tr>
+        {% endif %}
+        </tbody>
+    </table>
+
+    </div>
+
+    </div>
+  </main>
+
+{% endblock content %}
+{% block js %}
+
+<script>
+  $( document ).ready(function() {
+    $('.cart-form2').submit(function(e){
+      e.preventDefault()
+
+      const acc_id = $(this).attr('id')
+      console.log(acc_id)
+
+      const cart_count = $('#cart1').text()
+      const trimCount = parseInt(cart_count)
+
+      const btn_txt = $('#dlt').text()
+    
+
+
+      //const url = $(this).attr('action')
+
+      $.ajax({
+        type: 'GET',
+        url: '{% url "core:remove-from-cart" %}',
+        data: {
+          //'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val(),
+          'acc_id':acc_id
+        },
+
+        success: function(response) {
+            //res = trimCount - 1
+            res = response['resp']
+            const cart_count = $('#cart1').text(res);
+            $('.tbl').load(location.href +  ' .tbl');
+        },
+        error: function(response){
+          console.log("error", response)
+        }
+
+      })
+    
+
+   
+    })
+  })
+  
+</script>
+
+{% endblock js %}

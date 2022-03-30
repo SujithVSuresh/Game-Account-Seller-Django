@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block extra_head %}
+<style>
+.my_card{
+  margin-top: 150px;
+}
+
+
+</style>
+{% endblock %}
+{% block content %}
+  <main>
+    <div class="container">
+        <div class="row justify-content-center my_card">
+            <div class="col-md-6 col-12 m_card">
+                <div class="card p-4">
+                    <table class="table table-sm">
+                        <thead>
+                          <tr>
+                            <th scope="col">Game</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Account Owner</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>{{game_account.game}}</td>
+                            <td>{{game_account.rate}}</td>
+                            <td>{{game_account.description}}</td>
+                            <td>{{game_account.acc_owner}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <button type="button" class="btn btn-success" id="pay-btn">Make Payment</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+  </main>
+{% block js %}
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    var options = {
+       
+      // Enter the Key ID generated from the Dashboard
+      key: "{{ razorpay_merchant_key }}",
+       
+      // Amount is in currency subunits.
+      // Default currency is INR. Hence,
+      // 50000 refers to 50000 paise
+      amount: "{{ razorpay_amount }}",
+      currency: "{{ currency }}",
+       
+      // Your/store name.
+      name: "Buy GAccount",
+       
+      // Pass the `id` obtained in the response of Step 1
+      order_id: "{{ razorpay_order_id }}",
+      callback_url: "{{ callback_url }}",
+      acc_amount: "{{ game_account.rate }}",
+
+      "prefill": {
+          "email": "gaurav.kumar@example.com",
+          "contact": "9999999999",
+          "method":"upi"
+    },
+
+    "theme": {
+        "color": "#FFFF00"
+    }
+
+    };
+     
+    // initialise razorpay with the options.
+    var rzp1 = new Razorpay(options);
+     
+    // add event listener to the payment button.
+    document.getElementById("pay-btn").onclick = function (e) {
+      rzp1.open();
+      e.preventDefault();
+    };
+  </script>
+{% endblock js %}
+{% endblock content %}
